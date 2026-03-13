@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-black text-white font-sans antialiased;
+    margin: 0;
+    padding: 0;
+  }
+
+  ::selection {
+    background-color: #FF4D00;
+    color: white;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #111;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #FF4D00;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 bg-accent text-white px-8 py-3.5 font-semibold tracking-wide text-sm uppercase transition-all duration-200 hover:bg-accent-hover active:scale-95;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center gap-2 border border-white/30 text-white px-8 py-3.5 font-semibold tracking-wide text-sm uppercase transition-all duration-200 hover:border-white hover:bg-white/5 active:scale-95;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-black tracking-tight;
+  }
+
+  .tag {
+    @apply text-xs font-semibold tracking-widest uppercase text-accent;
+  }
+
+  .card-hover {
+    @apply transition-transform duration-300 hover:-translate-y-1;
+  }
+}
+
+/* Animations start hidden */
+.animate-fade-up,
+.animate-fade-up-delay,
+.animate-fade-up-delay2,
+.animate-fade-up-delay3,
+.animate-slide-left {
+  opacity: 0;
+}
