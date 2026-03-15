@@ -1,20 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, UserCheck, UserX } from 'lucide-react'
 
-const mockUsers = [
-  { id: 1, name: 'Alex Rivera', email: 'alex@email.com', orders: 8, total: '$1,240', joined: 'Jan 5, 2026', active: true },
-  { id: 2, name: 'Jamie Chen', email: 'jamie@email.com', orders: 5, total: '$890', joined: 'Jan 12, 2026', active: true },
-  { id: 3, name: 'Sam Wilson', email: 'sam@email.com', orders: 3, total: '$450', joined: 'Feb 2, 2026', active: true },
-  { id: 4, name: 'Morgan Lee', email: 'morgan@email.com', orders: 12, total: '$2,100', joined: 'Dec 20, 2025', active: true },
-  { id: 5, name: 'Taylor Kim', email: 'taylor@email.com', orders: 2, total: '$250', joined: 'Feb 28, 2026', active: false },
-  { id: 6, name: 'Jordan Park', email: 'jordan@email.com', orders: 7, total: '$1,050', joined: 'Jan 30, 2026', active: true },
-  { id: 7, name: 'Casey Brown', email: 'casey@email.com', orders: 1, total: '$95', joined: 'Mar 1, 2026', active: true },
-  { id: 8, name: 'Riley Scott', email: 'riley@email.com', orders: 4, total: '$620', joined: 'Feb 14, 2026', active: false },
-]
-
 export default function DashboardUsers() {
-  const [users, setUsers] = useState(mockUsers)
+  const [users, setUsers] = useState([])
   const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    fetch('/api/users').then(r => r.json()).then(setUsers)
+  }, [])
 
   const filtered = users.filter(
     (u) =>
@@ -22,8 +15,13 @@ export default function DashboardUsers() {
       u.email.toLowerCase().includes(search.toLowerCase())
   )
 
-  const toggleActive = (id) => {
-    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, active: !u.active } : u)))
+  const toggleActive = async (user) => {
+    const updated = await fetch(`/api/users/${user.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active: !user.active }),
+    }).then(r => r.json())
+    setUsers(prev => prev.map(u => u.id === updated.id ? updated : u))
   }
 
   return (
@@ -48,7 +46,7 @@ export default function DashboardUsers() {
         <div className="bg-[#111] border border-white/5 p-4">
           <p className="text-white/30 text-xs uppercase tracking-wide mb-2">Avg. Orders</p>
           <p className="text-white font-black text-2xl">
-            {(users.reduce((s, u) => s + u.orders, 0) / users.length).toFixed(1)}
+            {users.length ? (users.reduce((s, u) => s + u.orders, 0) / users.length).toFixed(1) : '—'}
           </p>
         </div>
       </div>
@@ -90,7 +88,9 @@ export default function DashboardUsers() {
                   </td>
                   <td className="px-5 py-4 text-white/40 text-xs">{user.email}</td>
                   <td className="px-5 py-4 text-white font-semibold">{user.orders}</td>
-                  <td className="px-5 py-4 text-white font-semibold">{user.total}</td>
+                  <td className="px-5 py-4 text-white font-semibold">
+                    {user.totalNum > 0 ? '$' + user.totalNum.toLocaleString('en-US', { maximumFractionDigits: 0 }) : user.total}
+                  </td>
                   <td className="px-5 py-4 text-white/30 text-xs">{user.joined}</td>
                   <td className="px-5 py-4">
                     <span className={`px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
@@ -101,7 +101,7 @@ export default function DashboardUsers() {
                   </td>
                   <td className="px-5 py-4">
                     <button
-                      onClick={() => toggleActive(user.id)}
+                      onClick={() => toggleActive(user)}
                       className={`text-xs transition-colors ${
                         user.active ? 'text-white/30 hover:text-red-400' : 'text-white/30 hover:text-green-400'
                       }`}

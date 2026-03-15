@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Outlet, NavLink, Link, useLocation } from 'react-router-dom'
+import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Package, ShoppingCart, Users, ArrowLeft,
   Menu, X, TrendingUp, LogOut
 } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 
 const navItems = [
   { to: '/admin/overview', icon: LayoutDashboard, label: 'Overview' },
@@ -14,6 +15,9 @@ const navItems = [
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+  const handleLogout = () => { logout(); navigate('/') }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex">
@@ -69,7 +73,7 @@ export default function DashboardLayout() {
             <ArrowLeft size={16} />
             Back to Store
           </Link>
-          <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-white/40 hover:text-red-400 transition-colors w-full">
+          <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-white/40 hover:text-red-400 transition-colors w-full">
             <LogOut size={16} />
             Sign Out
           </button>
@@ -100,11 +104,11 @@ export default function DashboardLayout() {
           </div>
           <div className="flex items-center gap-3 ml-auto">
             <div className="text-right hidden sm:block">
-              <p className="text-white text-sm font-semibold">Admin</p>
-              <p className="text-white/30 text-xs">Owner</p>
+              <p className="text-white text-sm font-semibold">{user?.name ?? 'Admin'}</p>
+              <p className="text-white/30 text-xs">Admin</p>
             </div>
             <div className="w-8 h-8 bg-accent flex items-center justify-center rounded-sm">
-              <span className="text-white text-xs font-bold">A</span>
+              <span className="text-white text-xs font-bold">{user?.name?.[0] ?? 'A'}</span>
             </div>
           </div>
         </header>

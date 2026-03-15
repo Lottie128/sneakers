@@ -1,14 +1,5 @@
-import { useState } from 'react'
-import { Search, Filter } from 'lucide-react'
-import { recentOrders } from '../../data/products'
-
-const allOrders = [
-  ...recentOrders,
-  { id: '#SS-1037', customer: 'Jordan Park', product: 'Air Phantom X', amount: '$189', status: 'Delivered', date: 'Mar 10, 2026' },
-  { id: '#SS-1036', customer: 'Casey Brown', product: 'Chuck 70 Hi', amount: '$95', status: 'Cancelled', date: 'Mar 9, 2026' },
-  { id: '#SS-1035', customer: 'Riley Scott', product: 'React Infinity Run', amount: '$155', status: 'Delivered', date: 'Mar 8, 2026' },
-  { id: '#SS-1034', customer: 'Drew Martinez', product: 'SB Dunk Low', amount: '$130', status: 'Shipped', date: 'Mar 7, 2026' },
-]
+import { useState, useEffect } from 'react'
+import { Search } from 'lucide-react'
 
 const statusColors = {
   Delivered: 'text-green-400 bg-green-400/10',
@@ -20,10 +11,15 @@ const statusColors = {
 const statuses = ['All', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
 
 export default function DashboardOrders() {
+  const [orders, setOrders] = useState([])
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('All')
 
-  const filtered = allOrders
+  useEffect(() => {
+    fetch('/api/orders').then(r => r.json()).then(setOrders)
+  }, [])
+
+  const filtered = orders
     .filter((o) => filterStatus === 'All' || o.status === filterStatus)
     .filter((o) =>
       o.customer.toLowerCase().includes(search.toLowerCase()) ||
@@ -34,7 +30,7 @@ export default function DashboardOrders() {
     <div>
       <div className="mb-8">
         <h1 className="text-white font-black text-2xl mb-1">Orders</h1>
-        <p className="text-white/30 text-sm">{allOrders.length} total orders</p>
+        <p className="text-white/30 text-sm">{orders.length} total orders</p>
       </div>
 
       {/* Filters row */}
